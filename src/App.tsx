@@ -121,6 +121,7 @@ export default function App() {
             unitPrice={unitPriceA}
             isWinner={winner === 'A'}
             isTriple={showProductC}
+            unitSize={unitSize}
           />
           <ProductColumn 
             label="商品 B" 
@@ -129,6 +130,7 @@ export default function App() {
             unitPrice={unitPriceB}
             isWinner={winner === 'B'}
             isTriple={showProductC}
+            unitSize={unitSize}
           />
           <AnimatePresence>
             {showProductC && (
@@ -154,6 +156,7 @@ export default function App() {
                   unitPrice={unitPriceC}
                   isWinner={winner === 'C'}
                   isTriple={true}
+                  unitSize={unitSize}
                 />
               </motion.div>
             )}
@@ -164,10 +167,10 @@ export default function App() {
       {/* Thinking Log */}
       <div className="hidden">
         思考ログ：
-        1. ヘッダーのラベルを「商品A」からシンプルな「A」に変更し、サイズを大きく太字にすることで、どの商品を入力しているかを瞬時に判別可能にしました。
-        2. 最安値商品のカラムには、黄金の王冠（👑）と細い黄金の枠線（ring）を追加し、視覚的な「勝利」をより明確に演出しました。
-        3. 3カラムの横並びレイアウトを維持しつつ、各要素の余白やサイズを微調整して、情報の密度と読みやすさのバランスを最適化しました。
-        4. apple-touch-iconの設定を維持し、iPhoneのホーム画面追加時のアイコン表示を確保しています。
+        1. アクセシビリティを最優先し、主要な文字サイズを大幅に拡大しました。ヘッダーの「A」「B」「C」は特大サイズ（3rem以上）とし、一目で判別できるようにしました。
+        2. 項目ラベル（金額、容量、単価）や単位の文字サイズを上げ、視認性を向上させました。
+        3. 入力エリアのパディングを増やし、フォントサイズを大きくすることで、操作ミスを防ぐ「指に優しい」デザインに最適化しました。
+        4. 3カラムの横並びレイアウト、apple-touch-icon設定、最安値の黄金演出（王冠と枠線）はすべて維持しています。
       </div>
     </div>
   );
@@ -180,9 +183,10 @@ interface ProductColumnProps {
   unitPrice: number | null;
   isWinner: boolean;
   isTriple: boolean;
+  unitSize: number;
 }
 
-function ProductColumn({ label, data, setData, unitPrice, isWinner, isTriple }: ProductColumnProps) {
+function ProductColumn({ label, data, setData, unitPrice, isWinner, isTriple, unitSize }: ProductColumnProps) {
   // Extract the letter (A, B, or C) from the label
   const letter = label.split(' ')[1] || label;
 
@@ -210,55 +214,63 @@ function ProductColumn({ label, data, setData, unitPrice, isWinner, isTriple }: 
 
       <div className={`${isTriple ? 'px-1 md:px-4' : 'px-4 md:px-8'} pb-4 flex flex-col gap-4`}>
         <div className="text-center py-2">
-          <span className={`text-3xl md:text-4xl font-black tracking-tighter ${isWinner ? 'text-yellow-700' : 'text-slate-400'}`}>
+          <span className={`text-5xl md:text-7xl font-black tracking-tighter ${isWinner ? 'text-yellow-700' : 'text-slate-400'}`}>
             {letter}
           </span>
         </div>
 
         {/* Price Input */}
         <div className="space-y-1">
-          <div className="flex items-center justify-center gap-0.5 text-[8px] md:text-[10px] font-bold text-slate-400 uppercase">
-            <JapaneseYen className="w-2 h-2 md:w-3 md:h-3" /> 金額
+          <div className="flex items-center justify-center gap-1 text-xs md:text-sm font-bold text-slate-500 uppercase">
+            <JapaneseYen className="w-3 h-3 md:w-4 md:h-4" /> 金額
           </div>
-          <input
-            type="text"
-            inputMode="decimal"
-            placeholder="0"
-            value={data.price}
-            onChange={(e) => setData({ ...data, price: e.target.value.replace(/[^0-9.]/g, '') })}
-            className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-1 py-3 text-center font-black focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${
-              isTriple ? 'text-lg md:text-2xl' : 'text-2xl md:text-4xl'
-            }`}
-          />
+          <div className="relative">
+            <input
+              type="text"
+              inputMode="decimal"
+              placeholder="0"
+              value={data.price}
+              onChange={(e) => setData({ ...data, price: e.target.value.replace(/[^0-9.]/g, '') })}
+              className={`w-full bg-slate-50 border border-slate-200 rounded-2xl px-2 py-4 md:py-5 text-center font-black focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all ${
+                isTriple ? 'text-2xl md:text-4xl' : 'text-4xl md:text-6xl'
+              }`}
+            />
+            <span className="absolute right-3 bottom-4 text-xs md:text-sm font-bold text-slate-400">円</span>
+          </div>
         </div>
 
         {/* Quantity Input */}
         <div className="space-y-1">
-          <div className="flex items-center justify-center gap-0.5 text-[8px] md:text-[10px] font-bold text-slate-400 uppercase">
-            <Scale className="w-2 h-2 md:w-3 md:h-3" /> 容量
+          <div className="flex items-center justify-center gap-1 text-xs md:text-sm font-bold text-slate-500 uppercase">
+            <Scale className="w-3 h-3 md:w-4 md:h-4" /> 容量
           </div>
-          <input
-            type="text"
-            inputMode="decimal"
-            placeholder="0"
-            value={data.quantity}
-            onChange={(e) => setData({ ...data, quantity: e.target.value.replace(/[^0-9.]/g, '') })}
-            className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-1 py-3 text-center font-black focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${
-              isTriple ? 'text-lg md:text-2xl' : 'text-2xl md:text-4xl'
-            }`}
-          />
+          <div className="relative">
+            <input
+              type="text"
+              inputMode="decimal"
+              placeholder="0"
+              value={data.quantity}
+              onChange={(e) => setData({ ...data, quantity: e.target.value.replace(/[^0-9.]/g, '') })}
+              className={`w-full bg-slate-50 border border-slate-200 rounded-2xl px-2 py-4 md:py-5 text-center font-black focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all ${
+                isTriple ? 'text-2xl md:text-4xl' : 'text-4xl md:text-6xl'
+              }`}
+            />
+            <span className="absolute right-3 bottom-4 text-xs md:text-sm font-bold text-slate-400">
+              {unitSize >= 1000 ? 'kg' : 'g/ml'}
+            </span>
+          </div>
         </div>
 
         {/* Unit Price Result */}
         <div className={`mt-2 pt-4 border-t border-slate-100 flex flex-col items-center ${isWinner ? 'border-yellow-200' : ''}`}>
-          <span className="text-[8px] md:text-[10px] font-bold text-slate-400 mb-1">単価</span>
-          <div className="flex items-baseline gap-0.5">
+          <span className="text-xs md:text-sm font-bold text-slate-500 mb-1">単価</span>
+          <div className="flex items-baseline gap-1">
             <span className={`font-black tracking-tighter ${isWinner ? 'text-yellow-600' : (unitPrice !== null ? 'text-slate-900' : 'text-slate-200')} ${
-              isTriple ? 'text-xl md:text-4xl' : 'text-3xl md:text-6xl'
+              isTriple ? 'text-2xl md:text-5xl' : 'text-5xl md:text-8xl'
             }`}>
               {unitPrice !== null ? Math.round(unitPrice).toLocaleString() : '---'}
             </span>
-            <span className="text-[8px] md:text-xs font-bold text-slate-400">円</span>
+            <span className="text-xs md:text-sm font-bold text-slate-400">円</span>
           </div>
         </div>
       </div>
