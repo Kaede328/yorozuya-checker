@@ -1,1 +1,1 @@
-{"name":"万屋チェッカー🌸","short_name":"万屋🌸","description":"万屋の在庫管理・チェッカー","start_url":"./","display":"standalone","background_color":"#ffffff","theme_color":"#1a2a4a","lang":"en","scope":"./","icons":[{"src":"./icon.svg","sizes":"120x120","type":"image/svg+xml"}]}
+{"name":"万屋チェッカー🌸","short_name":"万屋🌸","description":"万屋の在庫管理・チェッカー","start_url":"./","display":"standalone","background_color":"#ffffff","theme_color":"#1a2a4a","lang":"en","scope":"./","icons":[{"src":"./icon.jpg","sizes":"120x120","type":"image/jpeg"}]}
