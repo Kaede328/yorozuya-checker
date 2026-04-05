@@ -1,27 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Noto Serif JP", serif;
 }
 
 @layer base {
   body {
-    @apply font-sans text-slate-900 antialiased overflow-hidden;
+    @apply font-sans text-slate-900 antialiased bg-slate-50;
   }
 }
 
-.glass {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.glass-dark {
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.card-shadow {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }

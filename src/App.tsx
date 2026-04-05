@@ -5,7 +5,7 @@
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Crown, ShoppingCart, Scale, JapaneseYen, RotateCcw, Info } from 'lucide-react';
+import { ShoppingCart, Scale, JapaneseYen, RotateCcw, Plus, X, Crown, CheckCircle2 } from 'lucide-react';
 
 interface ProductData {
   price: string;
@@ -18,7 +18,8 @@ export default function App() {
   const [productA, setProductA] = useState<ProductData>(INITIAL_STATE);
   const [productB, setProductB] = useState<ProductData>(INITIAL_STATE);
   const [productC, setProductC] = useState<ProductData>(INITIAL_STATE);
-  const [unitSize, setUnitSize] = useState<number>(100); // 100g, 100ml, etc.
+  const [showProductC, setShowProductC] = useState(false);
+  const [unitSize, setUnitSize] = useState<number>(100);
 
   const calcUnitPrice = (data: ProductData) => {
     const p = parseFloat(data.price);
@@ -35,17 +36,22 @@ export default function App() {
     const prices = [
       { id: 'A', price: unitPriceA },
       { id: 'B', price: unitPriceB },
-      { id: 'C', price: unitPriceC },
-    ].filter(p => p.price !== null) as { id: string, price: number }[];
-
-    if (prices.length < 2) return null;
-
-    const minPrice = Math.min(...prices.map(p => p.price));
-    const winners = prices.filter(p => p.price === minPrice);
+    ];
     
-    if (winners.length === prices.length) return 'DRAW';
+    if (showProductC) {
+      prices.push({ id: 'C', price: unitPriceC });
+    }
+
+    const validPrices = prices.filter(p => p.price !== null) as { id: string, price: number }[];
+
+    if (validPrices.length < 2) return null;
+
+    const minPrice = Math.min(...validPrices.map(p => p.price));
+    const winners = validPrices.filter(p => p.price === minPrice);
+    
+    if (winners.length === validPrices.length) return 'DRAW';
     return winners[0].id;
-  }, [unitPriceA, unitPriceB, unitPriceC]);
+  }, [unitPriceA, unitPriceB, unitPriceC, showProductC]);
 
   const handleReset = () => {
     setProductA(INITIAL_STATE);
@@ -54,212 +60,208 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col items-center justify-start p-2 md:p-8 bg-slate-950 overflow-x-hidden">
-      {/* Background Image with Overlay */}
-      <div 
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-40"
-        style={{ 
-          backgroundImage: 'url("https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1920&auto=format&fit=crop")',
-          filter: 'sepia(0.3) brightness(0.5)'
-        }}
-      />
-      <div className="absolute inset-0 z-0 bg-gradient-to-b from-slate-950/20 via-slate-950/60 to-slate-950" />
-
+    <div className="min-h-screen w-full flex flex-col items-center bg-slate-50 text-slate-900 font-sans">
       {/* Header */}
-      <header className="relative z-10 w-full max-w-6xl mb-6 md:mb-12 flex flex-col items-center text-center">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center gap-2"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-0.5 bg-gradient-to-r from-transparent to-yellow-500/50 hidden md:block" />
-            <h1 className="text-4xl md:text-6xl font-serif font-black text-white tracking-widest drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-              万屋チェッカー
-            </h1>
-            <div className="w-12 h-0.5 bg-gradient-to-l from-transparent to-yellow-500/50 hidden md:block" />
+      <header className="w-full bg-white border-b border-slate-200 py-4 px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 bg-blue-600 rounded-lg">
+            <ShoppingCart className="w-5 h-5 text-white" />
           </div>
-          <p className="text-yellow-500/80 text-[10px] md:text-sm font-black uppercase tracking-[0.3em] font-serif">
-            Yorozuya Checker - 三つ巴の戦い
-          </p>
-        </motion.div>
+          <h1 className="text-xl font-black tracking-tight">
+            万屋チェッカー
+          </h1>
+        </div>
+        <div className="flex items-center gap-2">
+          {!showProductC && (
+            <button
+              onClick={() => setShowProductC(true)}
+              className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-xs font-bold hover:bg-blue-100 transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>商品を追加</span>
+            </button>
+          )}
+          <button
+            onClick={handleReset}
+            className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-600"
+            title="リセット"
+          >
+            <RotateCcw className="w-5 h-5" />
+          </button>
+        </div>
       </header>
 
-      <main className="relative z-10 w-full max-w-7xl grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 items-stretch px-2">
-        {/* Product A */}
-        <ProductCard 
-          title="壱" 
-          data={productA} 
-          setData={setProductA} 
-          unitPrice={unitPriceA}
-          isWinner={winner === 'A'}
-          unitSize={unitSize}
-          accentColor="blue"
-        />
-
-        {/* Product B */}
-        <ProductCard 
-          title="弐" 
-          data={productB} 
-          setData={setProductB} 
-          unitPrice={unitPriceB}
-          isWinner={winner === 'B'}
-          unitSize={unitSize}
-          accentColor="rose"
-        />
-
-        {/* Product C */}
-        <ProductCard 
-          title="参" 
-          data={productC} 
-          setData={setProductC} 
-          unitPrice={unitPriceC}
-          isWinner={winner === 'C'}
-          unitSize={unitSize}
-          accentColor="emerald"
-        />
-      </main>
-
-      {/* Unit Settings & Reset */}
-      <footer className="relative z-10 w-full max-w-4xl mt-8 md:mt-12 flex flex-col items-center gap-8">
-        <div className="glass px-6 py-4 rounded-full flex items-center gap-6 flex-wrap justify-center shadow-[0_0_30px_rgba(0,0,0,0.5)] border-white/5">
-          <div className="flex items-center gap-2 text-white/60">
-            <Info className="w-4 h-4" />
-            <span className="text-xs font-black tracking-widest">比較単位</span>
-          </div>
-          <div className="flex gap-2">
+      <main className="w-full max-w-5xl flex-1 flex flex-col p-2 md:p-6 gap-4">
+        {/* Unit Selection */}
+        <div className="flex items-center justify-center gap-2 py-2">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">比較単位:</span>
+          <div className="flex bg-slate-200 p-1 rounded-xl">
             {[1, 10, 100, 1000].map((size) => (
               <button
                 key={size}
                 onClick={() => setUnitSize(size)}
-                className={`px-5 py-2 rounded-full text-xs font-black transition-all duration-300 ${
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                   unitSize === size 
-                    ? 'bg-yellow-500 text-slate-950 shadow-[0_0_15px_rgba(234,179,8,0.4)] scale-110' 
-                    : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white'
+                    ? 'bg-white text-blue-600 shadow-sm' 
+                    : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
-                {size >= 1000 ? `${size/1000}kg` : `${size}g/ml`}
+                {size >= 1000 ? `${size/1000}kg` : `${size}g`}
               </button>
             ))}
           </div>
         </div>
 
-        <button
-          onClick={handleReset}
-          className="flex items-center gap-3 px-12 py-4 bg-white/5 hover:bg-white/10 text-white/50 hover:text-white rounded-full transition-all duration-500 border border-white/5 backdrop-blur-xl group"
-        >
-          <RotateCcw className="w-4 h-4 group-hover:rotate-[-180deg] transition-transform duration-700" />
-          <span className="text-sm font-black tracking-[0.4em] ml-1">初期化</span>
-        </button>
-      </footer>
+        {/* Comparison Grid */}
+        <div className={`grid gap-1 md:gap-4 flex-1 items-stretch ${showProductC ? 'grid-cols-3' : 'grid-cols-2 max-w-3xl mx-auto w-full'}`}>
+          <ProductColumn 
+            label="商品 A" 
+            data={productA} 
+            setData={setProductA} 
+            unitPrice={unitPriceA}
+            isWinner={winner === 'A'}
+            isTriple={showProductC}
+          />
+          <ProductColumn 
+            label="商品 B" 
+            data={productB} 
+            setData={setProductB} 
+            unitPrice={unitPriceB}
+            isWinner={winner === 'B'}
+            isTriple={showProductC}
+          />
+          <AnimatePresence>
+            {showProductC && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, x: 20 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.9, x: 20 }}
+                className="relative h-full"
+              >
+                <button
+                  onClick={() => {
+                    setShowProductC(false);
+                    setProductC(INITIAL_STATE);
+                  }}
+                  className="absolute -top-2 -right-2 z-20 w-6 h-6 bg-slate-800 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-slate-900 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <ProductColumn 
+                  label="商品 C" 
+                  data={productC} 
+                  setData={setProductC} 
+                  unitPrice={unitPriceC}
+                  isWinner={winner === 'C'}
+                  isTriple={true}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </main>
 
       {/* Thinking Log */}
       <div className="hidden">
         思考ログ：
-        1. アプリ名を「万屋チェッカー」に変更し、和風モダンな「Noto Serif JP」を採用。
-        2. 商品C（参）を追加し、3分割のグリッドレイアウトを実装。
-        3. 勝利判定を3者間で行い、最も安い商品に黄金の「桜の紋（Flowerアイコン）」を表示。
-        4. 背景に和の雰囲気を感じる画像とセピア調のフィルタを適用し、世界観を統一。
+        1. 動的なレイアウト切り替え機能を実装。初期状態は2カラム、ボタン操作で3カラムへ拡張可能に。
+        2. 商品Cの削除（×ボタン）により、柔軟に比較対象を調整できるようにしました。
+        3. 3カラム時でもモバイル画面で文字が重ならないよう、パディングやフォントサイズを微調整。
+        4. 最安値判定ロジックを動的に変更し、表示されている商品間でのみ比較を行うように最適化。
+        5. 勝利演出として「黄金の王冠」アイコンを採用し、視覚的なフィードバックを強化。
       </div>
     </div>
   );
 }
 
-interface ProductCardProps {
-  title: string;
+interface ProductColumnProps {
+  label: string;
   data: ProductData;
   setData: (data: ProductData) => void;
   unitPrice: number | null;
   isWinner: boolean;
-  unitSize: number;
-  accentColor: 'blue' | 'rose' | 'emerald';
+  isTriple: boolean;
 }
 
-function ProductCard({ title, data, setData, unitPrice, isWinner, unitSize, accentColor }: ProductCardProps) {
-  const colors = {
-    blue: 'text-blue-400',
-    rose: 'text-rose-400',
-    emerald: 'text-emerald-400',
-  };
-
+function ProductColumn({ label, data, setData, unitPrice, isWinner, isTriple }: ProductColumnProps) {
   return (
-    <motion.div 
-      layout
-      className={`relative p-5 md:p-8 rounded-[2.5rem] flex flex-col gap-6 md:gap-8 transition-all duration-700 border ${
-        isWinner 
-          ? 'bg-white/15 border-yellow-500/50 shadow-[0_0_50px_rgba(234,179,8,0.2)] scale-[1.03] z-10' 
-          : 'glass border-white/5 opacity-60'
-      }`}
-    >
-      <AnimatePresence>
-        {isWinner && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0, rotate: -45 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            exit={{ opacity: 0, scale: 0 }}
-            className="absolute -top-4 left-1/2 -translate-x-1/2 z-30 bg-gradient-to-br from-yellow-300 to-yellow-600 text-slate-950 px-6 py-2 rounded-full font-black flex items-center gap-2 shadow-[0_10px_20px_rgba(0,0,0,0.3)] whitespace-nowrap"
-          >
-            <div className="w-5 h-5 flex items-center justify-center">
-              <svg viewBox="0 0 24 24" className="w-full h-full fill-current">
-                <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z" />
-              </svg>
-            </div>
-            <span className="text-sm tracking-widest">最安の逸品</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col">
-          <span className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Product</span>
-          <h2 className={`text-3xl font-serif font-black italic ${colors[accentColor]}`}>{title}</h2>
-        </div>
-        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center rotate-3 ${isWinner ? 'bg-yellow-500/20' : 'bg-white/5'}`}>
-          <Scale className={`w-6 h-6 ${isWinner ? 'text-yellow-500' : 'text-white/20'}`} />
-        </div>
+    <div className={`relative flex flex-col rounded-2xl transition-all duration-500 border-2 h-full ${
+      isWinner 
+        ? 'bg-yellow-50 border-yellow-400 shadow-md z-10' 
+        : 'bg-white border-transparent'
+    }`}>
+      {/* Winner Label */}
+      <div className="h-8 flex items-center justify-center">
+        <AnimatePresence>
+          {isWinner && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-yellow-600 flex flex-col items-center"
+            >
+              <Crown className="w-5 h-5 fill-yellow-400" />
+              <span className="text-[8px] font-black uppercase tracking-tighter">最安値！</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      <div className="space-y-5">
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-white/40 ml-1 flex items-center gap-2 uppercase tracking-widest">
-            <JapaneseYen className="w-3 h-3" /> 金額 (円)
-          </label>
+      <div className={`${isTriple ? 'px-1 md:px-4' : 'px-4 md:px-8'} pb-4 flex flex-col gap-4`}>
+        <div className="text-center py-1">
+          <span className={`text-[10px] md:text-xs font-black tracking-tighter ${isWinner ? 'text-yellow-700' : 'text-slate-400'}`}>
+            {label}
+          </span>
+        </div>
+
+        {/* Price Input */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-center gap-0.5 text-[8px] md:text-[10px] font-bold text-slate-400 uppercase">
+            <JapaneseYen className="w-2 h-2 md:w-3 md:h-3" /> 金額
+          </div>
           <input
             type="text"
             inputMode="decimal"
             placeholder="0"
             value={data.price}
             onChange={(e) => setData({ ...data, price: e.target.value.replace(/[^0-9.]/g, '') })}
-            className="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-6 py-4 text-3xl font-black text-white placeholder:text-white/5 focus:outline-none focus:ring-2 focus:ring-yellow-500/30 transition-all"
+            className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-1 py-3 text-center font-black focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${
+              isTriple ? 'text-lg md:text-2xl' : 'text-2xl md:text-4xl'
+            }`}
           />
         </div>
 
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-white/40 ml-1 flex items-center gap-2 uppercase tracking-widest">
-            <Scale className="w-3 h-3" /> 容量 (g/ml)
-          </label>
+        {/* Quantity Input */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-center gap-0.5 text-[8px] md:text-[10px] font-bold text-slate-400 uppercase">
+            <Scale className="w-2 h-2 md:w-3 md:h-3" /> 容量
+          </div>
           <input
             type="text"
             inputMode="decimal"
             placeholder="0"
             value={data.quantity}
             onChange={(e) => setData({ ...data, quantity: e.target.value.replace(/[^0-9.]/g, '') })}
-            className="w-full bg-slate-900/50 border border-white/5 rounded-2xl px-6 py-4 text-3xl font-black text-white placeholder:text-white/5 focus:outline-none focus:ring-2 focus:ring-yellow-500/30 transition-all"
+            className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-1 py-3 text-center font-black focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${
+              isTriple ? 'text-lg md:text-2xl' : 'text-2xl md:text-4xl'
+            }`}
           />
         </div>
-      </div>
 
-      <div className={`mt-4 pt-8 border-t border-white/5 flex flex-col items-center transition-colors ${isWinner ? 'border-yellow-500/20' : ''}`}>
-        <span className="text-[10px] font-black text-white/30 mb-2 uppercase tracking-[0.2em]">
-          単価 / {unitSize >= 1000 ? `${unitSize/1000}kg` : `${unitSize}g`}
-        </span>
-        <div className="flex items-baseline gap-1">
-          <span className={`text-5xl font-black tracking-tighter ${isWinner ? 'text-yellow-500' : (unitPrice !== null ? 'text-white' : 'text-white/5')}`}>
-            {unitPrice !== null ? Math.round(unitPrice).toLocaleString() : '---'}
-          </span>
-          <span className="text-lg font-bold text-white/20">円</span>
+        {/* Unit Price Result */}
+        <div className={`mt-2 pt-4 border-t border-slate-100 flex flex-col items-center ${isWinner ? 'border-yellow-200' : ''}`}>
+          <span className="text-[8px] md:text-[10px] font-bold text-slate-400 mb-1">単価</span>
+          <div className="flex items-baseline gap-0.5">
+            <span className={`font-black tracking-tighter ${isWinner ? 'text-yellow-600' : (unitPrice !== null ? 'text-slate-900' : 'text-slate-200')} ${
+              isTriple ? 'text-xl md:text-4xl' : 'text-3xl md:text-6xl'
+            }`}>
+              {unitPrice !== null ? Math.round(unitPrice).toLocaleString() : '---'}
+            </span>
+            <span className="text-[8px] md:text-xs font-bold text-slate-400">円</span>
+          </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
+
+
