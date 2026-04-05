@@ -27,10 +27,11 @@ jobs:
       - name: Update root index.html
         run: |
           cp dist/index.html index.html
+          cp dist/icon.svg icon.svg
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html
-          git commit -m "Update root index.html from build [skip ci]" || echo "No changes to commit"
+          git add index.html icon.svg
+          git commit -m "Update root index.html and icon.svg from build [skip ci]" || echo "No changes to commit"
           git push
 
       - name: Deploy
