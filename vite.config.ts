@@ -15,16 +15,21 @@ export default defineConfig(({mode}) => {
       viteSingleFile(),
       VitePWA({
         registerType: 'autoUpdate',
+        includeAssets: ['icon.jpg'],
         manifest: {
           name: '万屋チェッカー🌸',
           short_name: '万屋🌸',
           description: '万屋の在庫管理・チェッカー',
           theme_color: '#1a2a4a',
+          background_color: '#1a2a4a',
+          display: 'standalone',
+          orientation: 'portrait',
           icons: [
             {
               src: './icon.jpg',
-              sizes: '120x120',
+              sizes: '120x120 180x180 192x192 512x512',
               type: 'image/jpeg',
+              purpose: 'any maskable',
             },
           ],
         },

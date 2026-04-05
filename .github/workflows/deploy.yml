@@ -24,7 +24,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Update root index.html
+      - name: Update root index.html and icon.jpg
         run: |
           cp dist/index.html index.html
           cp dist/icon.jpg icon.jpg
