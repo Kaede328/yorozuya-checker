@@ -1,0 +1,5 @@
+{
+  "name": "万屋チェッカー (Yorozuya Checker)",
+  "description": "商品A・B・Cの金額と容量を比較し、最もお得な逸品を瞬時に見極める万屋専用の単価比較アプリです。",
+  "requestFramePermissions": []
+}
