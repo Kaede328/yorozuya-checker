@@ -197,7 +197,7 @@ function ProductColumn({ label, data, setData, unitPrice, isWinner, isTriple, un
         : 'bg-white border-transparent'
     }`}>
       {/* Winner Label */}
-      <div className="h-10 flex items-center justify-center">
+      <div className="h-7 flex items-center justify-center">
         <AnimatePresence>
           {isWinner && (
             <motion.div
@@ -205,15 +205,15 @@ function ProductColumn({ label, data, setData, unitPrice, isWinner, isTriple, un
               animate={{ opacity: 1, scale: 1, y: 0 }}
               className="text-yellow-600 flex flex-col items-center"
             >
-              <Crown className="w-6 h-6 fill-yellow-400" />
-              <span className="text-[10px] font-black uppercase tracking-tighter">最安値！</span>
+              <Crown className="w-5 h-5 fill-yellow-400" />
+              <span className="text-[9px] font-black uppercase tracking-tighter">最安値！</span>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
       <div className={`${isTriple ? 'px-1 md:px-4' : 'px-4 md:px-8'} pb-4 flex flex-col gap-4`}>
-        <div className="text-center py-2">
+        <div className="text-center pt-0 pb-1">
           <span className={`text-5xl md:text-7xl font-black tracking-tighter ${isWinner ? 'text-yellow-700' : 'text-slate-400'}`}>
             {letter}
           </span>
