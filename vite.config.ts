@@ -22,9 +22,9 @@ export default defineConfig(({mode}) => {
           theme_color: '#1a2a4a',
           icons: [
             {
-              src: './icon.svg',
+              src: './icon.jpg',
               sizes: '120x120',
-              type: 'image/svg+xml',
+              type: 'image/jpeg',
             },
           ],
         },
