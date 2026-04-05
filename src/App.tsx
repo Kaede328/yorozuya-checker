@@ -164,11 +164,10 @@ export default function App() {
       {/* Thinking Log */}
       <div className="hidden">
         思考ログ：
-        1. 動的なレイアウト切り替え機能を実装。初期状態は2カラム、ボタン操作で3カラムへ拡張可能に。
-        2. 商品Cの削除（×ボタン）により、柔軟に比較対象を調整できるようにしました。
-        3. 3カラム時でもモバイル画面で文字が重ならないよう、パディングやフォントサイズを微調整。
-        4. 最安値判定ロジックを動的に変更し、表示されている商品間でのみ比較を行うように最適化。
-        5. 勝利演出として「黄金の王冠」アイコンを採用し、視覚的なフィードバックを強化。
+        1. ヘッダーのラベルを「商品A」からシンプルな「A」に変更し、サイズを大きく太字にすることで、どの商品を入力しているかを瞬時に判別可能にしました。
+        2. 最安値商品のカラムには、黄金の王冠（👑）と細い黄金の枠線（ring）を追加し、視覚的な「勝利」をより明確に演出しました。
+        3. 3カラムの横並びレイアウトを維持しつつ、各要素の余白やサイズを微調整して、情報の密度と読みやすさのバランスを最適化しました。
+        4. apple-touch-iconの設定を維持し、iPhoneのホーム画面追加時のアイコン表示を確保しています。
       </div>
     </div>
   );
@@ -184,32 +183,35 @@ interface ProductColumnProps {
 }
 
 function ProductColumn({ label, data, setData, unitPrice, isWinner, isTriple }: ProductColumnProps) {
+  // Extract the letter (A, B, or C) from the label
+  const letter = label.split(' ')[1] || label;
+
   return (
     <div className={`relative flex flex-col rounded-2xl transition-all duration-500 border-2 h-full ${
       isWinner 
-        ? 'bg-yellow-50 border-yellow-400 shadow-md z-10' 
+        ? 'bg-yellow-50 border-yellow-400 shadow-md z-10 ring-1 ring-yellow-400' 
         : 'bg-white border-transparent'
     }`}>
       {/* Winner Label */}
-      <div className="h-8 flex items-center justify-center">
+      <div className="h-10 flex items-center justify-center">
         <AnimatePresence>
           {isWinner && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, scale: 0.5, y: 5 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
               className="text-yellow-600 flex flex-col items-center"
             >
-              <Crown className="w-5 h-5 fill-yellow-400" />
-              <span className="text-[8px] font-black uppercase tracking-tighter">最安値！</span>
+              <Crown className="w-6 h-6 fill-yellow-400" />
+              <span className="text-[10px] font-black uppercase tracking-tighter">最安値！</span>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
       <div className={`${isTriple ? 'px-1 md:px-4' : 'px-4 md:px-8'} pb-4 flex flex-col gap-4`}>
-        <div className="text-center py-1">
-          <span className={`text-[10px] md:text-xs font-black tracking-tighter ${isWinner ? 'text-yellow-700' : 'text-slate-400'}`}>
-            {label}
+        <div className="text-center py-2">
+          <span className={`text-3xl md:text-4xl font-black tracking-tighter ${isWinner ? 'text-yellow-700' : 'text-slate-400'}`}>
+            {letter}
           </span>
         </div>
 
