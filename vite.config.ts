@@ -8,6 +8,11 @@ export default defineConfig(({mode}) => {
   return {
     base: '/yorozuya-checker/',
     plugins: [react(), tailwindcss()],
+    build: {
+      outDir: 'dist',
+      assetsDir: 'assets',
+      emptyOutDir: true,
+    },
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },
