@@ -236,23 +236,23 @@ function ProductColumn({
         : 'bg-white border-transparent'
     }`}>
       {/* Winner Label */}
-      <div className="h-12 flex items-center justify-center">
+      <div className="h-20 flex items-center justify-center">
         <AnimatePresence>
           {isWinner && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5, y: 5 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="text-yellow-600 flex flex-col items-center"
+              className="text-yellow-600 flex flex-col items-center gap-1"
             >
-              <Crown className="w-5 h-5 fill-yellow-400" />
-              <span className="text-[9px] font-black uppercase tracking-tighter">最安値！</span>
+              <Crown className="w-8 h-8 fill-yellow-400" />
+              <span className="text-sm md:text-base font-black uppercase tracking-tighter">最安値！</span>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
       <div className={`${isTriple ? 'px-1 md:px-4' : 'px-4 md:px-8'} pb-4 flex flex-col gap-4`}>
-        <div className="text-center pt-10 pb-4">
+        <div className="text-center pt-2 pb-4">
           <span className={`text-5xl md:text-7xl font-black tracking-tighter ${isWinner ? 'text-yellow-700' : 'text-slate-400'}`}>
             {letter}
           </span>
