@@ -259,9 +259,9 @@ function ProductColumn({
         </div>
 
         {/* Price Input */}
-        <div className="space-y-1">
-          <div className="flex items-center justify-center gap-1 text-xs md:text-sm font-bold text-slate-500 uppercase">
-            <JapaneseYen className="w-3 h-3 md:w-4 md:h-4" /> 金額
+        <div className="space-y-2">
+          <div className="flex items-center justify-center gap-1.5 text-base md:text-lg font-bold text-slate-600 uppercase">
+            <JapaneseYen className="w-4 h-4 md:w-5 md:h-5" /> 金額
           </div>
           <div className="relative">
             <input
@@ -281,9 +281,9 @@ function ProductColumn({
         </div>
 
         {/* Quantity Input */}
-        <div className="space-y-1">
-          <div className="flex items-center justify-center gap-1 text-xs md:text-sm font-bold text-slate-500 uppercase">
-            <Scale className="w-3 h-3 md:w-4 md:h-4" /> 容量
+        <div className="space-y-2">
+          <div className="flex items-center justify-center gap-1.5 text-base md:text-lg font-bold text-slate-600 uppercase">
+            <Scale className="w-4 h-4 md:w-5 md:h-5" /> 容量
           </div>
           <div className="relative">
             <input
@@ -306,7 +306,7 @@ function ProductColumn({
 
         {/* Unit Price Result */}
         <div className={`mt-2 pt-4 border-t border-slate-100 flex flex-col items-center ${isWinner ? 'border-yellow-200' : ''}`}>
-          <span className="text-xs md:text-sm font-bold text-slate-500 mb-1">単価</span>
+          <span className="text-base md:text-lg font-bold text-slate-600 mb-1">単価</span>
           <div className="flex items-baseline gap-1">
             <span className={`font-black tracking-tighter ${isWinner ? 'text-yellow-600' : (unitPrice !== null ? 'text-slate-900' : 'text-slate-200')} ${
               isTriple ? 'text-2xl md:text-5xl' : 'text-5xl md:text-8xl'
