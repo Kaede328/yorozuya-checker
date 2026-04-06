@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useMemo, useRef, KeyboardEvent, MutableRefObject } from 'react';
+import React, { useState, useMemo, useRef, useEffect, KeyboardEvent, MutableRefObject } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShoppingCart, Scale, JapaneseYen, RotateCcw, Plus, X, Crown } from 'lucide-react';
 
@@ -15,14 +15,36 @@ interface ProductData {
 const INITIAL_STATE: ProductData = { price: '', quantity: '' };
 
 export default function App() {
-  // 商品データを配列で管理（将来的な拡張性を確保）
-  const [products, setProducts] = useState<ProductData[]>([
-    { ...INITIAL_STATE },
-    { ...INITIAL_STATE },
-    { ...INITIAL_STATE }
-  ]);
-  const [visibleCount, setVisibleCount] = useState(2);
-  const [unitSize, setUnitSize] = useState<number>(100);
+  // 商品データを配列で管理（localStorageから復元）
+  const [products, setProducts] = useState<ProductData[]>(() => {
+    const saved = localStorage.getItem('yorozuya_products');
+    return saved ? JSON.parse(saved) : [
+      { ...INITIAL_STATE },
+      { ...INITIAL_STATE },
+      { ...INITIAL_STATE }
+    ];
+  });
+  const [visibleCount, setVisibleCount] = useState<number>(() => {
+    const saved = localStorage.getItem('yorozuya_visibleCount');
+    return saved ? parseInt(saved, 10) : 2;
+  });
+  const [unitSize, setUnitSize] = useState<number>(() => {
+    const saved = localStorage.getItem('yorozuya_unitSize');
+    return saved ? parseInt(saved, 10) : 100;
+  });
+
+  // 自動保存ロジック
+  useEffect(() => {
+    localStorage.setItem('yorozuya_products', JSON.stringify(products));
+  }, [products]);
+
+  useEffect(() => {
+    localStorage.setItem('yorozuya_visibleCount', visibleCount.toString());
+  }, [visibleCount]);
+
+  useEffect(() => {
+    localStorage.setItem('yorozuya_unitSize', unitSize.toString());
+  }, [unitSize]);
 
   // 入力要素の参照を管理
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -55,6 +77,7 @@ export default function App() {
 
   const handleReset = () => {
     setProducts(products.map(() => ({ ...INITIAL_STATE })));
+    localStorage.removeItem('yorozuya_products');
   };
 
   const updateProduct = (index: number, newData: ProductData) => {
