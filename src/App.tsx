@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, KeyboardEvent, MutableRefObject } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShoppingCart, Scale, JapaneseYen, RotateCcw, Plus, X, Crown } from 'lucide-react';
 
@@ -64,7 +64,7 @@ export default function App() {
   };
 
   // オートフォーカス遷移ロジック
-  const handleKeyDown = (e: React.KeyboardEvent, currentIndex: number) => {
+  const handleKeyDown = (e: KeyboardEvent, currentIndex: number) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       const nextIndex = currentIndex + 1;
@@ -188,8 +188,8 @@ interface ProductColumnProps {
   isWinner: boolean;
   isTriple: boolean;
   unitSize: number;
-  inputRefs: React.MutableRefObject<(HTMLInputElement | null)[]>;
-  onKeyDown: (e: React.KeyboardEvent, currentIndex: number) => void;
+  inputRefs: MutableRefObject<(HTMLInputElement | null)[]>;
+  onKeyDown: (e: KeyboardEvent, currentIndex: number) => void;
 }
 
 function ProductColumn({ 
@@ -213,7 +213,7 @@ function ProductColumn({
         : 'bg-white border-transparent'
     }`}>
       {/* Winner Label */}
-      <div className="h-7 flex items-center justify-center">
+      <div className="h-12 flex items-center justify-center">
         <AnimatePresence>
           {isWinner && (
             <motion.div
@@ -229,7 +229,7 @@ function ProductColumn({
       </div>
 
       <div className={`${isTriple ? 'px-1 md:px-4' : 'px-4 md:px-8'} pb-4 flex flex-col gap-4`}>
-        <div className="text-center pt-0 pb-1">
+        <div className="text-center pt-10 pb-4">
           <span className={`text-5xl md:text-7xl font-black tracking-tighter ${isWinner ? 'text-yellow-700' : 'text-slate-400'}`}>
             {letter}
           </span>
