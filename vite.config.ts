@@ -26,10 +26,16 @@ export default defineConfig(({mode}) => {
           orientation: 'portrait',
           icons: [
             {
-              src: './icon.jpg',
-              sizes: '120x120 180x180 192x192 512x512',
+              src: '/yorozuya-checker/icon.jpg',
+              sizes: '192x192',
               type: 'image/jpeg',
-              purpose: 'any maskable',
+              purpose: 'any',
+            },
+            {
+              src: '/yorozuya-checker/icon.jpg',
+              sizes: '512x512',
+              type: 'image/jpeg',
+              purpose: 'maskable',
             },
           ],
         },
