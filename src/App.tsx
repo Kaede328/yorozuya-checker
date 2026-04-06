@@ -120,7 +120,7 @@ export default function App() {
   return (
     <div className="min-h-screen w-full flex flex-col items-center bg-slate-50 text-slate-900 font-sans">
       {/* Header */}
-      <header className="w-full bg-white border-b border-slate-200 py-4 px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+      <header className="w-full bg-white border-b border-slate-200 py-2 px-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
         <div className="flex items-center gap-2">
           <div className="p-1.5 bg-blue-600 rounded-lg">
             <ShoppingCart className="w-5 h-5 text-white" />
@@ -149,9 +149,9 @@ export default function App() {
         </div>
       </header>
 
-      <main className="w-full max-w-5xl flex-1 flex flex-col p-2 md:p-6 gap-4">
+      <main className="w-full max-w-5xl flex-1 flex flex-col p-1 md:p-4 gap-2">
         {/* Unit Selection */}
-        <div className="flex items-center justify-center gap-2 py-2">
+        <div className="flex items-center justify-center gap-2 py-1">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">比較単位:</span>
           <div className="flex bg-slate-200 p-1 rounded-xl">
             {[1, 10, 100, 1000].map((size) => (
@@ -171,7 +171,7 @@ export default function App() {
         </div>
 
         {/* Comparison Grid */}
-        <div className={`grid gap-1 md:gap-4 flex-1 items-stretch ${visibleCount === 3 ? 'grid-cols-3' : 'grid-cols-2 max-w-3xl mx-auto w-full'}`}>
+        <div className={`grid gap-1 md:gap-2 flex-1 items-stretch ${visibleCount === 3 ? 'grid-cols-3' : 'grid-cols-2 max-w-3xl mx-auto w-full'}`}>
           {products.slice(0, visibleCount).map((product, idx) => (
             <motion.div
               key={idx}
@@ -256,32 +256,32 @@ function ProductColumn({
         : 'bg-white border-transparent'
     }`}>
       {/* Winner Label */}
-      <div className="h-20 flex items-center justify-center">
+      <div className="h-12 flex items-center justify-center">
         <AnimatePresence>
           {isWinner && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5, y: 5 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="text-yellow-600 flex flex-col items-center gap-1"
+              className="text-yellow-600 flex flex-col items-center gap-0.5"
             >
-              <Crown className="w-8 h-8 fill-yellow-400" />
-              <span className="text-sm md:text-base font-black uppercase tracking-tighter">最安値！</span>
+              <Crown className="w-6 h-6 fill-yellow-400" />
+              <span className="text-xs md:text-sm font-black uppercase tracking-tighter">最安値！</span>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      <div className={`${isTriple ? 'px-1 md:px-4' : 'px-4 md:px-8'} pb-4 flex flex-col gap-4`}>
-        <div className="text-center pt-2 pb-4">
-          <span className={`text-5xl md:text-7xl font-black tracking-tighter ${isWinner ? 'text-yellow-700' : 'text-slate-400'}`}>
+      <div className={`${isTriple ? 'px-1 md:px-2' : 'px-2 md:px-4'} pb-2 flex flex-col gap-2`}>
+        <div className="text-center pt-1 pb-2">
+          <span className={`text-4xl md:text-6xl font-black tracking-tighter ${isWinner ? 'text-yellow-700' : 'text-slate-400'}`}>
             {letter}
           </span>
         </div>
 
         {/* Price Input */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-center gap-1.5 text-base md:text-lg font-bold text-slate-600 uppercase">
-            <JapaneseYen className="w-4 h-4 md:w-5 md:h-5" /> 金額
+        <div className="space-y-1">
+          <div className="flex items-center justify-center gap-1 text-sm md:text-base font-bold text-slate-600 uppercase">
+            <JapaneseYen className="w-3.5 h-3.5 md:w-4 md:h-4" /> 金額
           </div>
           <div className="relative">
             <input
@@ -292,19 +292,19 @@ function ProductColumn({
               value={data.price}
               onChange={(e) => setData({ ...data, price: e.target.value.replace(/[^0-9.]/g, '') })}
               onKeyDown={(e) => onKeyDown(e, index * 3)}
-              className={`w-full bg-slate-50 border border-slate-200 rounded-2xl px-2 py-4 md:py-5 text-center font-black focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all ${
-                isTriple ? 'text-2xl md:text-4xl' : 'text-4xl md:text-6xl'
+              className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-2 md:py-3 text-center font-black focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all ${
+                isTriple ? 'text-xl md:text-3xl' : 'text-3xl md:text-5xl'
               }`}
             />
-            <span className="absolute right-3 bottom-4 text-xs md:text-sm font-bold text-slate-400">円</span>
+            <span className="absolute right-2 bottom-2 text-[10px] md:text-xs font-bold text-slate-400">円</span>
           </div>
         </div>
 
         {/* Quantity & Count Inputs */}
-        <div className="grid grid-cols-1 gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center justify-center gap-1.5 text-base md:text-lg font-bold text-slate-600 uppercase">
-              <Scale className="w-4 h-4 md:w-5 md:h-5" /> 容量
+        <div className="grid grid-cols-1 gap-2">
+          <div className="space-y-1">
+            <div className="flex items-center justify-center gap-1 text-sm md:text-base font-bold text-slate-600 uppercase">
+              <Scale className="w-3.5 h-3.5 md:w-4 md:h-4" /> 容量
             </div>
             <div className="relative">
               <input
@@ -315,19 +315,19 @@ function ProductColumn({
                 value={data.quantity}
                 onChange={(e) => setData({ ...data, quantity: e.target.value.replace(/[^0-9.]/g, '') })}
                 onKeyDown={(e) => onKeyDown(e, index * 3 + 1)}
-                className={`w-full bg-slate-50 border border-slate-200 rounded-2xl px-2 py-4 md:py-5 text-center font-black focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all ${
-                  isTriple ? 'text-xl md:text-3xl' : 'text-3xl md:text-5xl'
+                className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-2 md:py-3 text-center font-black focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all ${
+                  isTriple ? 'text-lg md:text-2xl' : 'text-2xl md:text-4xl'
                 }`}
               />
-              <span className="absolute right-3 bottom-4 text-xs md:text-sm font-bold text-slate-400">
+              <span className="absolute right-2 bottom-2 text-[10px] md:text-xs font-bold text-slate-400">
                 {unitSize >= 1000 ? 'kg' : 'g/ml'}
               </span>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <div className="flex items-center justify-center gap-1.5 text-base md:text-lg font-bold text-slate-600 uppercase">
-              <Plus className="w-4 h-4 md:w-5 md:h-5" /> 個数
+          <div className="space-y-1">
+            <div className="flex items-center justify-center gap-1 text-sm md:text-base font-bold text-slate-600 uppercase">
+              <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" /> 個数
             </div>
             <div className="relative">
               <input
@@ -338,28 +338,28 @@ function ProductColumn({
                 value={data.count}
                 onChange={(e) => setData({ ...data, count: e.target.value.replace(/[^0-9]/g, '') })}
                 onKeyDown={(e) => onKeyDown(e, index * 3 + 2)}
-                className={`w-full bg-slate-50 border border-slate-200 rounded-2xl px-2 py-4 md:py-5 text-center font-black focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all ${
-                  isTriple ? 'text-xl md:text-3xl' : 'text-3xl md:text-5xl'
+                className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-2 md:py-3 text-center font-black focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all ${
+                  isTriple ? 'text-lg md:text-2xl' : 'text-2xl md:text-4xl'
                 }`}
               />
-              <span className="absolute right-3 bottom-4 text-xs md:text-sm font-bold text-slate-400">個</span>
+              <span className="absolute right-2 bottom-2 text-[10px] md:text-xs font-bold text-slate-400">個</span>
             </div>
           </div>
         </div>
 
         {/* Unit Price Result */}
-        <div className={`mt-2 pt-4 border-t border-slate-100 flex flex-col items-center ${isWinner ? 'border-yellow-200' : ''}`}>
-          <span className="text-base md:text-lg font-bold text-slate-600 mb-1">
+        <div className={`mt-1 pt-2 border-t border-slate-100 flex flex-col items-center ${isWinner ? 'border-yellow-200' : ''}`}>
+          <span className="text-sm md:text-base font-bold text-slate-600 mb-0.5">
             {isPerItem ? '1個あたり' : '単価'}
           </span>
-          <div className="flex items-baseline gap-1">
+          <div className="flex items-baseline gap-0.5">
             <span className={`font-black tracking-tighter ${isWinner ? 'text-yellow-600' : (unitPrice !== null ? 'text-slate-900' : 'text-slate-200')} ${
-              isTriple ? 'text-2xl md:text-5xl' : 'text-5xl md:text-8xl'
+              isTriple ? 'text-xl md:text-4xl' : 'text-4xl md:text-7xl'
             }`}>
               {unitPrice !== null ? Math.round(unitPrice).toLocaleString() : '---'}
             </span>
-            <span className="text-xs md:text-sm font-bold text-slate-400">
-              円{(!isPerItem && unitPrice !== null) && <span className="text-[10px] ml-0.5">/{unitSize >= 1000 ? `${unitSize/1000}kg` : `${unitSize}g`}</span>}
+            <span className="text-[10px] md:text-xs font-bold text-slate-400">
+              円{(!isPerItem && unitPrice !== null) && <span className="text-[8px] ml-0.5">/{unitSize >= 1000 ? `${unitSize/1000}kg` : `${unitSize}g`}</span>}
             </span>
           </div>
         </div>
