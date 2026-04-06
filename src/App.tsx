@@ -10,15 +10,25 @@ import { ShoppingCart, Scale, JapaneseYen, RotateCcw, Plus, X, Crown } from 'luc
 interface ProductData {
   price: string;
   quantity: string;
+  count: string;
 }
 
-const INITIAL_STATE: ProductData = { price: '', quantity: '' };
+const INITIAL_STATE: ProductData = { price: '', quantity: '', count: '1' };
 
 export default function App() {
   // 商品データを配列で管理（localStorageから復元）
   const [products, setProducts] = useState<ProductData[]>(() => {
     const saved = localStorage.getItem('yorozuya_products');
-    return saved ? JSON.parse(saved) : [
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // 既存データに count がない場合のマイグレーション
+      return parsed.map((p: any) => ({
+        ...INITIAL_STATE,
+        ...p,
+        count: p.count || '1'
+      }));
+    }
+    return [
       { ...INITIAL_STATE },
       { ...INITIAL_STATE },
       { ...INITIAL_STATE }
@@ -52,8 +62,17 @@ export default function App() {
   const calcUnitPrice = (data: ProductData) => {
     const p = parseFloat(data.price);
     const q = parseFloat(data.quantity);
-    if (isNaN(p) || isNaN(q) || q <= 0) return null;
-    return (p / q) * unitSize;
+    const c = parseFloat(data.count) || 1;
+    
+    if (isNaN(p) || c <= 0) return null;
+    
+    // 容量が空、または0の場合：1個あたりの単価
+    if (isNaN(q) || q <= 0) {
+      return p / c;
+    }
+    
+    // 容量がある場合：指定単位あたりの単価
+    return (p / (q * c)) * unitSize;
   };
 
   const unitPrices = useMemo(() => 
@@ -228,6 +247,7 @@ function ProductColumn({
   onKeyDown
 }: ProductColumnProps) {
   const letter = label.split(' ')[1] || label;
+  const isPerItem = !data.quantity || parseFloat(data.quantity) <= 0;
 
   return (
     <div className={`relative flex flex-col rounded-2xl transition-all duration-500 border-2 h-full ${
@@ -265,13 +285,13 @@ function ProductColumn({
           </div>
           <div className="relative">
             <input
-              ref={(el) => (inputRefs.current[index * 2] = el)}
+              ref={(el) => (inputRefs.current[index * 3] = el)}
               type="text"
               inputMode="decimal"
               placeholder="0"
               value={data.price}
               onChange={(e) => setData({ ...data, price: e.target.value.replace(/[^0-9.]/g, '') })}
-              onKeyDown={(e) => onKeyDown(e, index * 2)}
+              onKeyDown={(e) => onKeyDown(e, index * 3)}
               className={`w-full bg-slate-50 border border-slate-200 rounded-2xl px-2 py-4 md:py-5 text-center font-black focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all ${
                 isTriple ? 'text-2xl md:text-4xl' : 'text-4xl md:text-6xl'
               }`}
@@ -280,40 +300,67 @@ function ProductColumn({
           </div>
         </div>
 
-        {/* Quantity Input */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-center gap-1.5 text-base md:text-lg font-bold text-slate-600 uppercase">
-            <Scale className="w-4 h-4 md:w-5 md:h-5" /> 容量
+        {/* Quantity & Count Inputs */}
+        <div className="grid grid-cols-1 gap-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-center gap-1.5 text-base md:text-lg font-bold text-slate-600 uppercase">
+              <Scale className="w-4 h-4 md:w-5 md:h-5" /> 容量
+            </div>
+            <div className="relative">
+              <input
+                ref={(el) => (inputRefs.current[index * 3 + 1] = el)}
+                type="text"
+                inputMode="decimal"
+                placeholder="0"
+                value={data.quantity}
+                onChange={(e) => setData({ ...data, quantity: e.target.value.replace(/[^0-9.]/g, '') })}
+                onKeyDown={(e) => onKeyDown(e, index * 3 + 1)}
+                className={`w-full bg-slate-50 border border-slate-200 rounded-2xl px-2 py-4 md:py-5 text-center font-black focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all ${
+                  isTriple ? 'text-xl md:text-3xl' : 'text-3xl md:text-5xl'
+                }`}
+              />
+              <span className="absolute right-3 bottom-4 text-xs md:text-sm font-bold text-slate-400">
+                {unitSize >= 1000 ? 'kg' : 'g/ml'}
+              </span>
+            </div>
           </div>
-          <div className="relative">
-            <input
-              ref={(el) => (inputRefs.current[index * 2 + 1] = el)}
-              type="text"
-              inputMode="decimal"
-              placeholder="0"
-              value={data.quantity}
-              onChange={(e) => setData({ ...data, quantity: e.target.value.replace(/[^0-9.]/g, '') })}
-              onKeyDown={(e) => onKeyDown(e, index * 2 + 1)}
-              className={`w-full bg-slate-50 border border-slate-200 rounded-2xl px-2 py-4 md:py-5 text-center font-black focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all ${
-                isTriple ? 'text-2xl md:text-4xl' : 'text-4xl md:text-6xl'
-              }`}
-            />
-            <span className="absolute right-3 bottom-4 text-xs md:text-sm font-bold text-slate-400">
-              {unitSize >= 1000 ? 'kg' : 'g/ml'}
-            </span>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-center gap-1.5 text-base md:text-lg font-bold text-slate-600 uppercase">
+              <Plus className="w-4 h-4 md:w-5 md:h-5" /> 個数
+            </div>
+            <div className="relative">
+              <input
+                ref={(el) => (inputRefs.current[index * 3 + 2] = el)}
+                type="text"
+                inputMode="numeric"
+                placeholder="1"
+                value={data.count}
+                onChange={(e) => setData({ ...data, count: e.target.value.replace(/[^0-9]/g, '') })}
+                onKeyDown={(e) => onKeyDown(e, index * 3 + 2)}
+                className={`w-full bg-slate-50 border border-slate-200 rounded-2xl px-2 py-4 md:py-5 text-center font-black focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all ${
+                  isTriple ? 'text-xl md:text-3xl' : 'text-3xl md:text-5xl'
+                }`}
+              />
+              <span className="absolute right-3 bottom-4 text-xs md:text-sm font-bold text-slate-400">個</span>
+            </div>
           </div>
         </div>
 
         {/* Unit Price Result */}
         <div className={`mt-2 pt-4 border-t border-slate-100 flex flex-col items-center ${isWinner ? 'border-yellow-200' : ''}`}>
-          <span className="text-base md:text-lg font-bold text-slate-600 mb-1">単価</span>
+          <span className="text-base md:text-lg font-bold text-slate-600 mb-1">
+            {isPerItem ? '1個あたり' : '単価'}
+          </span>
           <div className="flex items-baseline gap-1">
             <span className={`font-black tracking-tighter ${isWinner ? 'text-yellow-600' : (unitPrice !== null ? 'text-slate-900' : 'text-slate-200')} ${
               isTriple ? 'text-2xl md:text-5xl' : 'text-5xl md:text-8xl'
             }`}>
               {unitPrice !== null ? Math.round(unitPrice).toLocaleString() : '---'}
             </span>
-            <span className="text-xs md:text-sm font-bold text-slate-400">円</span>
+            <span className="text-xs md:text-sm font-bold text-slate-400">
+              円{(!isPerItem && unitPrice !== null) && <span className="text-[10px] ml-0.5">/{unitSize >= 1000 ? `${unitSize/1000}kg` : `${unitSize}g`}</span>}
+            </span>
           </div>
         </div>
       </div>
