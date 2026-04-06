@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ShoppingCart, Scale, JapaneseYen, RotateCcw, Plus, X, Crown, CheckCircle2 } from 'lucide-react';
+import { ShoppingCart, Scale, JapaneseYen, RotateCcw, Plus, X, Crown } from 'lucide-react';
 
 interface ProductData {
   price: string;
@@ -15,11 +15,17 @@ interface ProductData {
 const INITIAL_STATE: ProductData = { price: '', quantity: '' };
 
 export default function App() {
-  const [productA, setProductA] = useState<ProductData>(INITIAL_STATE);
-  const [productB, setProductB] = useState<ProductData>(INITIAL_STATE);
-  const [productC, setProductC] = useState<ProductData>(INITIAL_STATE);
-  const [showProductC, setShowProductC] = useState(false);
+  // 商品データを配列で管理（将来的な拡張性を確保）
+  const [products, setProducts] = useState<ProductData[]>([
+    { ...INITIAL_STATE },
+    { ...INITIAL_STATE },
+    { ...INITIAL_STATE }
+  ]);
+  const [visibleCount, setVisibleCount] = useState(2);
   const [unitSize, setUnitSize] = useState<number>(100);
+
+  // 入力要素の参照を管理
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const calcUnitPrice = (data: ProductData) => {
     const p = parseFloat(data.price);
@@ -28,21 +34,15 @@ export default function App() {
     return (p / q) * unitSize;
   };
 
-  const unitPriceA = useMemo(() => calcUnitPrice(productA), [productA, unitSize]);
-  const unitPriceB = useMemo(() => calcUnitPrice(productB), [productB, unitSize]);
-  const unitPriceC = useMemo(() => calcUnitPrice(productC), [productC, unitSize]);
+  const unitPrices = useMemo(() => 
+    products.map(p => calcUnitPrice(p)), 
+    [products, unitSize]
+  );
 
   const winner = useMemo(() => {
-    const prices = [
-      { id: 'A', price: unitPriceA },
-      { id: 'B', price: unitPriceB },
-    ];
-    
-    if (showProductC) {
-      prices.push({ id: 'C', price: unitPriceC });
-    }
-
-    const validPrices = prices.filter(p => p.price !== null) as { id: string, price: number }[];
+    const validPrices = unitPrices
+      .map((price, index) => ({ id: String.fromCharCode(65 + index), price, index }))
+      .filter(p => p.index < visibleCount && p.price !== null) as { id: string, price: number, index: number }[];
 
     if (validPrices.length < 2) return null;
 
@@ -51,12 +51,28 @@ export default function App() {
     
     if (winners.length === validPrices.length) return 'DRAW';
     return winners[0].id;
-  }, [unitPriceA, unitPriceB, unitPriceC, showProductC]);
+  }, [unitPrices, visibleCount]);
 
   const handleReset = () => {
-    setProductA(INITIAL_STATE);
-    setProductB(INITIAL_STATE);
-    setProductC(INITIAL_STATE);
+    setProducts(products.map(() => ({ ...INITIAL_STATE })));
+  };
+
+  const updateProduct = (index: number, newData: ProductData) => {
+    const newProducts = [...products];
+    newProducts[index] = newData;
+    setProducts(newProducts);
+  };
+
+  // オートフォーカス遷移ロジック
+  const handleKeyDown = (e: React.KeyboardEvent, currentIndex: number) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const nextIndex = currentIndex + 1;
+      // 次の入力欄が存在すればフォーカスを移動
+      if (inputRefs.current[nextIndex]) {
+        inputRefs.current[nextIndex]?.focus();
+      }
+    }
   };
 
   return (
@@ -72,9 +88,9 @@ export default function App() {
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          {!showProductC && (
+          {visibleCount < 3 && (
             <button
-              onClick={() => setShowProductC(true)}
+              onClick={() => setVisibleCount(3)}
               className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-xs font-bold hover:bg-blue-100 transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -113,70 +129,58 @@ export default function App() {
         </div>
 
         {/* Comparison Grid */}
-        <div className={`grid gap-1 md:gap-4 flex-1 items-stretch ${showProductC ? 'grid-cols-3' : 'grid-cols-2 max-w-3xl mx-auto w-full'}`}>
-          <ProductColumn 
-            label="商品 A" 
-            data={productA} 
-            setData={setProductA} 
-            unitPrice={unitPriceA}
-            isWinner={winner === 'A'}
-            isTriple={showProductC}
-            unitSize={unitSize}
-          />
-          <ProductColumn 
-            label="商品 B" 
-            data={productB} 
-            setData={setProductB} 
-            unitPrice={unitPriceB}
-            isWinner={winner === 'B'}
-            isTriple={showProductC}
-            unitSize={unitSize}
-          />
-          <AnimatePresence>
-            {showProductC && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9, x: 20 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.9, x: 20 }}
-                className="relative h-full"
-              >
+        <div className={`grid gap-1 md:gap-4 flex-1 items-stretch ${visibleCount === 3 ? 'grid-cols-3' : 'grid-cols-2 max-w-3xl mx-auto w-full'}`}>
+          {products.slice(0, visibleCount).map((product, idx) => (
+            <motion.div
+              key={idx}
+              layout
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="relative h-full"
+            >
+              {idx === 2 && (
                 <button
                   onClick={() => {
-                    setShowProductC(false);
-                    setProductC(INITIAL_STATE);
+                    setVisibleCount(2);
+                    updateProduct(2, INITIAL_STATE);
                   }}
                   className="absolute -top-2 -right-2 z-20 w-6 h-6 bg-slate-800 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-slate-900 transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
-                <ProductColumn 
-                  label="商品 C" 
-                  data={productC} 
-                  setData={setProductC} 
-                  unitPrice={unitPriceC}
-                  isWinner={winner === 'C'}
-                  isTriple={true}
-                  unitSize={unitSize}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+              )}
+              <ProductColumn 
+                index={idx}
+                label={`商品 ${String.fromCharCode(65 + idx)}`} 
+                data={product} 
+                setData={(data) => updateProduct(idx, data)} 
+                unitPrice={unitPrices[idx]}
+                isWinner={winner === String.fromCharCode(65 + idx)}
+                isTriple={visibleCount === 3}
+                unitSize={unitSize}
+                inputRefs={inputRefs}
+                onKeyDown={handleKeyDown}
+              />
+            </motion.div>
+          ))}
         </div>
       </main>
 
       {/* Thinking Log */}
       <div className="hidden">
         思考ログ：
-        1. アクセシビリティを最優先し、主要な文字サイズを大幅に拡大しました。ヘッダーの「A」「B」「C」は特大サイズ（3rem以上）とし、一目で判別できるようにしました。
-        2. 項目ラベル（金額、容量、単価）や単位の文字サイズを上げ、視認性を向上させました。
-        3. 入力エリアのパディングを増やし、フォントサイズを大きくすることで、操作ミスを防ぐ「指に優しい」デザインに最適化しました。
-        4. 3カラムの横並びレイアウト、apple-touch-icon設定、最安値の黄金演出（王冠と枠線）はすべて維持しています。
+        1. 商品データを配列管理（products: ProductData[]）にリファクタリングし、商品数が増えてもロジックを変更せずに対応できる汎用性を確保しました。
+        2. useRef を用いて全入力欄の参照を一括管理し、Enterキー（モバイルの「次へ」ボタン）押下時にインデックスに基づいて次の入力欄へ自動フォーカスする機能を実装しました。
+        3. 遷移順序は「商品nの金額 → 商品nの容量 → 商品n+1の金額」となり、スムーズな連続入力を可能にしました。
+        4. iOS/Androidのテンキー入力時でも、確定操作で次の項目へ移動するようイベントハンドリングを最適化しました。
       </div>
     </div>
   );
 }
 
 interface ProductColumnProps {
+  index: number;
   label: string;
   data: ProductData;
   setData: (data: ProductData) => void;
@@ -184,10 +188,22 @@ interface ProductColumnProps {
   isWinner: boolean;
   isTriple: boolean;
   unitSize: number;
+  inputRefs: React.MutableRefObject<(HTMLInputElement | null)[]>;
+  onKeyDown: (e: React.KeyboardEvent, currentIndex: number) => void;
 }
 
-function ProductColumn({ label, data, setData, unitPrice, isWinner, isTriple, unitSize }: ProductColumnProps) {
-  // Extract the letter (A, B, or C) from the label
+function ProductColumn({ 
+  index, 
+  label, 
+  data, 
+  setData, 
+  unitPrice, 
+  isWinner, 
+  isTriple, 
+  unitSize,
+  inputRefs,
+  onKeyDown
+}: ProductColumnProps) {
   const letter = label.split(' ')[1] || label;
 
   return (
@@ -226,11 +242,13 @@ function ProductColumn({ label, data, setData, unitPrice, isWinner, isTriple, un
           </div>
           <div className="relative">
             <input
+              ref={(el) => (inputRefs.current[index * 2] = el)}
               type="text"
               inputMode="decimal"
               placeholder="0"
               value={data.price}
               onChange={(e) => setData({ ...data, price: e.target.value.replace(/[^0-9.]/g, '') })}
+              onKeyDown={(e) => onKeyDown(e, index * 2)}
               className={`w-full bg-slate-50 border border-slate-200 rounded-2xl px-2 py-4 md:py-5 text-center font-black focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all ${
                 isTriple ? 'text-2xl md:text-4xl' : 'text-4xl md:text-6xl'
               }`}
@@ -246,11 +264,13 @@ function ProductColumn({ label, data, setData, unitPrice, isWinner, isTriple, un
           </div>
           <div className="relative">
             <input
+              ref={(el) => (inputRefs.current[index * 2 + 1] = el)}
               type="text"
               inputMode="decimal"
               placeholder="0"
               value={data.quantity}
               onChange={(e) => setData({ ...data, quantity: e.target.value.replace(/[^0-9.]/g, '') })}
+              onKeyDown={(e) => onKeyDown(e, index * 2 + 1)}
               className={`w-full bg-slate-50 border border-slate-200 rounded-2xl px-2 py-4 md:py-5 text-center font-black focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all ${
                 isTriple ? 'text-2xl md:text-4xl' : 'text-4xl md:text-6xl'
               }`}
