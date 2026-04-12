@@ -109,10 +109,17 @@ export default function App() {
   const handleKeyDown = (e: KeyboardEvent, currentIndex: number) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      const nextIndex = currentIndex + 1;
-      // 次の入力欄が存在すればフォーカスを移動
-      if (inputRefs.current[nextIndex]) {
-        inputRefs.current[nextIndex]?.focus();
+      const lastIndex = (visibleCount * 3) - 1;
+      
+      if (currentIndex >= lastIndex) {
+        // 最後の項目の場合はキーボードを閉じる
+        (e.target as HTMLInputElement).blur();
+      } else {
+        // 次の入力欄へ移動
+        const nextIndex = currentIndex + 1;
+        if (inputRefs.current[nextIndex]) {
+          inputRefs.current[nextIndex]?.focus();
+        }
       }
     }
   };
