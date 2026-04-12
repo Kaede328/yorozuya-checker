@@ -13,7 +13,7 @@ interface ProductData {
   count: string;
 }
 
-const INITIAL_STATE: ProductData = { price: '', quantity: '', count: '1' };
+const INITIAL_STATE: ProductData = { price: '', quantity: '', count: '' };
 
 export default function App() {
   // 商品データを配列で管理（localStorageから復元）
@@ -25,7 +25,7 @@ export default function App() {
       return parsed.map((p: any) => ({
         ...INITIAL_STATE,
         ...p,
-        count: p.count || '1'
+        count: p.count !== undefined ? p.count : ''
       }));
     }
     return [
